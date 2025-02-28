@@ -11,7 +11,7 @@ logging.basicConfig(
     level=logging.INFO
 )
 
-TOKEN = "7551900755:AAH8skoX9BQo307xKqERidHPpEQNvQy1O6I"
+TOKEN = "7551900755:AAECNVXBRNK09TY5l25DJ5KW3WQ-D6I5Ie8"
 CHAOS_API = "https://chaos-data.projectdiscovery.io/index.json"
 BUG_BOUNTY_RADAR_API = "https://raw.githubusercontent.com/kingpaler/bbrf/master/programs.json"
 
