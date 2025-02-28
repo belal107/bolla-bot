@@ -1,35 +1,44 @@
+import os
 import logging
 import requests
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
 
-TOKEN = "7551900755:AAECNVXBRNK09TY5l25DJ5KW3WQ-D6I5Ie8"
-BUG_BOUNTY_RADAR_API = "https://raw.githubusercontent.com/bugbounty-radar/changelogs/main/chaos-bugbounty-list.json"
+TOKEN = os.getenv("7551900755:AAECNVXBRNK09TY5l25DJ5KW3WQ-D6I5Ie8")
+CHAOS_API = "https://chaos-data.projectdiscovery.io/index.json"
+BUG_BOUNTY_RADAR_API = "https://bugbountyradar.io/api/programs" 
 
 logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await update.message.reply_text("اهلا بيك يا معلم انا بوله بوت تحت امرك 💪.")
+    await update.message.reply_text("Hey Bolla! Bot is running ✅")
 
 async def new_programs(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    radar_response = requests.get(BUG_BOUNTY_RADAR_API)
-    if radar_response.headers["Content-Type"] == "application/json":
-        radar_programs = radar_response.json()
-        message = "🔥 Bug Bounty Radar Latest Programs:\n\n"
-        for program in radar_programs[:5]:
-            message += f"📌 {program['name']} - {program['url']}\n"
-        await update.message.reply_text(message)
-    else:
-        await update.message.reply_text("API Error: The API did not return JSON data.")
-        print("API Error:", radar_response.text)
+    try:
+        radar_response = requests.get(BUG_BOUNTY_RADAR_API)
+        radar_programs = radar_response.json() if radar_response.headers['Content-Type'].startswith('application/json') else []
+        radar_text = '\n'.join([program['name'] for program in radar_programs[:10]]) if radar_programs else "No programs available from Bug Bounty Radar."
+    except Exception as e:
+        radar_text = f"Error fetching Bug Bounty Radar programs: {str(e)}"
 
-application = Application.builder().token(TOKEN).build()
-application.add_handler(CommandHandler("start", start))
-application.add_handler(CommandHandler("new", new_programs))
+    try:
+        chaos_response = requests.get(CHAOS_API)
+        chaos_programs = chaos_response.json() if chaos_response.headers['Content-Type'].startswith('application/json') else []
+        chaos_text = '\n'.join([program['name'] for program in chaos_programs[:10]]) if chaos_programs else "No programs available from Chaos."
+    except Exception as e:
+        chaos_text = f"Error fetching Chaos programs: {str(e)}"
 
-if __name__ == "__main__":
-    print("Bolla Bot is running...")
-    application.run_polling()
+    message = f"Bug Bounty Radar Programs:\n{radar_text}\n\nChaos Programs:\n{chaos_text}"
+    await update.message.reply_text(message)
+
+if __name__ == '__main__':
+    app = Application.builder().token(TOKEN).build()
+
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(CommandHandler("new", new_programs))
+
+    logging.info("Application started")
+    app.run_polling()
