@@ -3,7 +3,7 @@ import requests
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
 
-TOKEN = "TELEGRAM_BOT_TOKEN"
+TOKEN = "7551900755:AAECNVXBRNK09TY5l25DJ5KW3WQ-D6I5Ie8"
 BUG_BOUNTY_RADAR_API = "https://raw.githubusercontent.com/bugbounty-radar/changelogs/main/chaos-bugbounty-list.json"
 
 logging.basicConfig(
